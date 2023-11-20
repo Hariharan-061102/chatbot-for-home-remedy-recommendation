@@ -1,0 +1,135 @@
+{
+  "language": "en",
+  "intents": [
+    {
+      "name": "greeting",
+      "examples": [
+        "Hi",
+        "Hello",
+        "Hey there"
+      ],
+      "responses": [
+        "Hello! How can I assist you today?",
+        "Hi there! How can I help you?"
+      ]
+    },
+    {
+      "name": "goodbye",
+      "examples": [
+        "Goodbye",
+        "Bye",
+        "See you later"
+      ],
+      "responses": [
+        "Goodbye! Have a great day!",
+        "Bye! Take care."
+      ]
+    },
+    {
+      "name": "thanks",
+      "examples": [
+        "Thank you",
+        "Thanks a lot",
+        "Much appreciated"
+      ],
+      "responses": [
+        "You're welcome!",
+        "Glad I could help!"
+      ]
+    },
+    {
+      "name": "Peppermint",
+      "examples": ["irritable bowel syndrome", "IBS", "headaches"],
+      "responses": [
+        "Peppermint oil might help with irritable bowel syndrome by reducing symptoms like cramps, bloating, and gas.",
+        "It may also provide relief for headaches, but further studies are needed to understand its effectiveness."
+      ]
+    },
+    {
+      "name": "Honey",
+      "examples": ["cough"],
+      "responses": [
+        "Honey can be as effective as over-the-counter medicines for coughs, especially in children. However, avoid giving it to infants under 1 year due to the risk of food poisoning."
+      ]
+    },
+    {
+      "name": "Turmeric",
+      "examples": ["arthritis", "fatty liver"],
+      "responses": [
+        "Early research suggests turmeric may offer benefits for conditions like arthritis and fatty liver. However, claims for healing ulcers and skin rashes after radiation lack solid proof."
+      ]
+    },
+    {
+      "name": "Ginger",
+      "examples": ["stomachaches", "nausea", "menstrual cramps"],
+      "responses": [
+        "Ginger has been traditionally used to alleviate stomachaches, nausea, and menstrual cramps. Yet, it might not suit everyone and could cause digestive issues or interact with certain medications."
+      ]
+    },
+    {
+      "name": "Green Tea",
+      "examples": ["antioxidants", "heart disease", "cancers"],
+      "responses": [
+        "Green tea is rich in antioxidants that can protect cells, lower the risk of heart disease, and potentially reduce the chances of certain cancers."
+      ]
+    },
+    {
+      "name": "Garlic",
+      "examples": ["certain types of cancer", "blood cholesterol", "blood pressure"],
+      "responses": [
+        "Studies indicate that increased garlic intake is linked to a lower risk of specific cancers and may help in controlling blood cholesterol and blood pressure levels."
+      ]
+    },
+    {
+      "name": "Chicken Soup",
+      "examples": ["common cold", "symptom relief"],
+      "responses": [
+        "Chicken soup is known to ease symptoms and reduce the duration of the common cold, providing relief by curbing swelling and clearing nasal fluids."
+      ]
+    },
+    {
+      "name": "Neti Pot",
+      "examples": ["allergy symptoms", "common cold"],
+      "responses": [
+        "Using a neti pot with a salt and warm water mixture can alleviate allergy or common cold symptoms, aiding in a quicker recovery."
+      ]
+    },
+    {
+      "name": "Cinnamon",
+      "examples": ["blood sugar", "diabetes"],
+      "responses": [
+        "While there's no strong evidence supporting its effectiveness for medical conditions, cinnamon is believed by some to help control blood sugar. However, caution is advised due to potential liver issues in high doses."
+      ]
+    },
+    {
+      "name": "Hot Bath",
+      "examples": ["arthritis", "back pain", "joint pain"],
+      "responses": [
+        "A hot bath can provide relief for conditions affecting muscles, bones, and tendons like arthritis, back pain, and joint pain. It promotes blood flow, but avoid excessive heat if you have a skin condition."
+      ]
+    },
+    {
+      "name": "Ice Pack",
+      "examples": ["pain relief", "injuries", "swelling"],
+      "responses": [
+        "Using an ice pack aids in pain relief and reduces swelling in injuries, especially within the first 48 hours. Limit usage to 20 minutes and avoid direct application on the skin."
+      ]
+    },
+    {
+      "name": "Petroleum Jelly",
+      "examples": ["skin moisture", "diaper rash"],
+      "responses": [
+        "Petroleum jelly helps retain skin moisture, preventing chafing and protecting the skin. It's beneficial for preventing diaper rash in babies."
+      ]
+    },
+    {
+      "name": "Ear Candling",
+      "examples": ["earwax removal"],
+      "responses": [
+        "Ear candling is unsafe and ineffective. It can lead to various complications and injuries. Seek medical advice for safe earwax removal."
+      ]
+    }
+    
+  ]
+  
+}
