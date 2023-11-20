@@ -1,182 +1,177 @@
-# Emotion detection 
+# Home Remedy Recommendation Chatbox
 
-
-This project is a Streamlit application that recommends songs based on users' captured emotions. It uses computer vision techniques to detect emotions from video frames and provides song recommendations on YouTube or Spotify.
-
-## Features
-
-- Captures users' emotions through the webcam.
-- Performs real-time emotion classification using a pre-trained model.
-- Overlays the predicted emotions on the video frames.
-- Recommends songs on YouTube or Spotify based on the captured emotions, language, and singer preferences.
-- Opens a web browser window with relevant search results for song recommendations.
+This project is a simple chatbot implemented in Python that suggests home remedies based on user input queries. It utilizes Natural Language Processing (NLP) techniques and a neural network model to classify user queries and provide relevant home remedy recommendations.
 
 ## Requirements
 
 - Python 3.x
-- Required Python packages: streamlit, streamlit_webrtc, av, opencv-python, numpy, mediapipe, keras, webbrowser
+- Required Python packages: nltk, numpy, tensorflow
+
+## Features
+-Dataset Loading: The code mounts a Google Drive and loads a dataset (dataset.json) containing intents and corresponding examples related to home remedies.
+-Data Preprocessing: The script tokenizes text, lemmatizes words, creates a bag-of-words representation, and prepares the dataset for training.
+-Neural Network Model: Utilizes TensorFlow/Keras to create a sequential neural network model for classification tasks. The model architecture comprises multiple dense layers with dropout for reducing overfitting.
+-Training and Model Summary: Trains the neural network model using the prepared dataset, displaying the model architecture summary and training logs (loss and accuracy) for each epoch.
+-Prediction and Response Generation: Provides functions for predicting classes based on user input messages, retrieving responses related to predicted classes from the dataset, and generating appropriate chatbot responses.
+
 
 ## Architecture Diagram/Flow
 
-![Diagram1](diagram1.png)
-![Diagram2](diagram2.png)
+![Diagram1](a1.png)
 
 ## Installation
 
 1. Clone the repository:
 
    ```shell
-   git clone https://github.com/your-username/emotion-based-music-recommender.git
+   git clone https://github.com/Hariharan-061102/chatbot-for-home-remedy-recommendation.git
 
 2. Install the required packages:
-
-   ```shell
-   pip install -r requirements.txt
-
-3. Download the pre-trained emotion classification model and label mappings.
-   (Place the model.h5 file and labels.npy file in the project directory.)
+      tensorflow
+      punkt
+      wordnet
+3. import the json dataset.
+4. Run the Code.
 
 ## Usage
 
-1. Run the Streamlit application
-   ```shell
-   streamlit run app.py
-   ```
+-Mount Google Drive:
+Run the code snippet in a Google Colab environment to mount your Google Drive.
+Ensure the presence of a dataset file named dataset.json within the specified drive path (/content/drive/My Drive/chat__bot).
 
-2. Access the application in your web browser at http://localhost:8501.
+-Data Preparation and Model Training:
+The code automatically preprocesses the dataset, creates a neural network model, and trains it on the prepared dataset for 150 epochs.
+Check the model summary and training logs to assess the training progress and performance.
 
-3. Enter the desired language, singer, and music player preferences.
+-Interacting with the Chatbot:
+After the training phase, the script allows interaction with the chatbot through the console.
+Input your queries or messages to the chatbot, and it will predict relevant intents based on the trained model.
+The chatbot will respond with recommendations or appropriate responses related to the predicted intent.
 
-4. Allow access to your webcam.
-
-5. The application will start capturing your emotions in real-time.
-
-6. Click the "Recommend me songs" button to get song recommendations based on your captured emotions.
-
-7. A web browser window will open with search results on YouTube or Spotify, depending on your music player preference.
-
-8. Repeat the process by providing new inputs and capturing emotions again.
+-Exit Chatbot:
+Enter "0" to exit the chatbot interaction loop.
 
 ## Program:
 
 ```python
-import streamlit as st
-from streamlit_webrtc import webrtc_streamer
-import av
-import cv2
+from google.colab import drive
+drive.mount('/content/drive')
+data_root='/content/drive/My Drive/chat__bot'
+
+import json
+import string
+import random
+
+import nltk
 import numpy as np
-import mediapipe as mp
-from keras.models import load_model
-import webbrowser
+from nltk.stem import WordNetLemmatizer
+import tensorflow as tf
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense,Dropout
+nltk.download("punkt")
+nltk.download("wordnet")
 
-model = load_model("model.h5")
-label = np.load("labels.npy")
-holistic = mp.solutions.holistic
-hands = mp.solutions.hands
-holis = holistic.Holistic()
-drawing = mp.solutions.drawing_utils
+data_file=open(data_root + '/dataset.json').read()
+data=json.loads(data_file)
 
-st.header("Emotion Based Music Recommender")
+words=[]
+classes=[]
+data_X=[]
+data_Y=[]
 
-if "run" not in st.session_state:
-    st.session_state["run"] = "true"
+for intent in data["intents"]:
+  for pattern in intent["examples"]:
+    tokens=nltk.word_tokenize(pattern)
+    words.extend(tokens)
+    data_X.append(pattern)
+    data_Y.append(intent["name"]),
+  if intent["name"] not in classes:
+    classes.append(intent["name"])
 
-try:
-    emotion = np.load("emotion.npy")[0]
-except:
-    emotion = ""
+lemmatizer=WordNetLemmatizer()
+words=[lemmatizer.lemmatize(word.lower()) for word in words if word not in string.punctuation]
+words=sorted(set(words))
+classes=sorted(set(classes))
 
-if not (emotion):
-    st.session_state["run"] = "true"
-else:
-    st.session_state["run"] = "false"
+training=[]
+out_empty=[0]*len(classes)
+for idx,doc in enumerate(data_X):
+  bow=[]
+  text=lemmatizer.lemmatize(doc.lower())
+  for word in words:
+    bow.append(1) if word in text else bow.append(0)
+  output_row=list(out_empty)
+  output_row[classes.index(data_Y[idx])]=1
+  training.append([bow,output_row])
+random.shuffle(training)
+training=np.array(training,dtype=object)
+train_X=np.array(list(training[:,0]))
+train_Y=np.array(list(training[:,1]))
 
+model=Sequential()
+model.add(Dense(128,input_shape=(len(train_X[0]),),activation="relu"))
+model.add(Dropout(0.5))
+model.add(Dense(64,activation="relu"))
+model.add(Dropout(0.5))
+model.add(Dense(len(train_Y[0]),activation="softmax"))
+adam=tf.keras.optimizers.legacy.Adam(learning_rate=0.01,decay=1e-6)
+model.compile(loss='categorical_crossentropy',optimizer=adam,metrics=["accuracy"])
+print(model.summary())
+model.fit(x=train_X,y=train_Y,epochs=150,verbose=1)
 
-class EmotionProcessor:
-    def recv(self, frame):
-        frm = frame.to_ndarray(format="bgr24")
+def clean_text(text):
+  tokens=nltk.word_tokenize(text)
+  tokens=[lemmatizer.lemmatize(word) for word in tokens]
+  return tokens
 
-        frm = cv2.flip(frm, 1)
+def bag_of_words(text,vocab):
+  tokens=clean_text(text)
+  bow=[0] *len(vocab)
+  for w in tokens:
+    for idx,word in enumerate(vocab):
+      if word== w:
+        bow[idx]=1
+  return np.array(bow)
 
-        res = holis.process(cv2.cvtColor(frm, cv2.COLOR_BGR2RGB))
+def pred_class(text,vocab,labels):
+  bow=bag_of_words(text,vocab)
+  result=model.predict(np.array([bow]))[0]
+  thresh=0.5
+  y_pred=[[indx,res] for indx,res in enumerate(result) if res > thresh]
+  y_pred.sort(key=lambda x: x[1], reverse=True)
+  return_list=[]
+  for r in y_pred:
+    return_list.append(labels[r[0]])
+  return return_list
 
-        lst = []
+def get_response(intents_list,intents_json):
+  if len(intents_list)==0:
+    result = "Sorry! I don't understand."
+  else:
+    tag=intents_list[0]
+    list_of_intents=intents_json["intents"]
+    for i in list_of_intents:
+      if i["name"] == tag:
+        result=random.choice(i["responses"])
+        break
+  return result
 
-        if res.face_landmarks:
-            for i in res.face_landmarks.landmark:
-                lst.append(i.x - res.face_landmarks.landmark[1].x)
-                lst.append(i.y - res.face_landmarks.landmark[1].y)
+print("Press 0 if you don't want to chat with our ChatBot.")
+while True:
+  message=input("")
+  if message == "0":
+    break
+  intents=pred_class(message,words,classes)
+  result=get_response(intents,data)
+  print(result)
 
-            if res.left_hand_landmarks:
-                for i in res.left_hand_landmarks.landmark:
-                    lst.append(i.x - res.left_hand_landmarks.landmark[8].x)
-                    lst.append(i.y - res.left_hand_landmarks.landmark[8].y)
-            else:
-                for i in range(42):
-                    lst.append(0.0)
-
-            if res.right_hand_landmarks:
-                for i in res.right_hand_landmarks.landmark:
-                    lst.append(i.x - res.right_hand_landmarks.landmark[8].x)
-                    lst.append(i.y - res.right_hand_landmarks.landmark[8].y)
-            else:
-                for i in range(42):
-                    lst.append(0.0)
-
-            lst = np.array(lst).reshape(1, -1)
-
-            pred = label[np.argmax(model.predict(lst))]
-
-            print(pred)
-            cv2.putText(frm, pred, (50, 50), cv2.FONT_ITALIC, 1, (255, 0, 0), 2)
-
-            np.save("emotion.npy", np.array([pred]))
-
-        drawing.draw_landmarks(frm, res.face_landmarks, holistic.FACEMESH_TESSELATION,
-                               landmark_drawing_spec=drawing.DrawingSpec(color=(0, 0, 255), thickness=-1,
-                                                                         circle_radius=1),
-                               connection_drawing_spec=drawing.DrawingSpec(thickness=1))
-        drawing.draw_landmarks(frm, res.left_hand_landmarks, hands.HAND_CONNECTIONS)
-        drawing.draw_landmarks(frm, res.right_hand_landmarks, hands.HAND_CONNECTIONS)
-
-        ##############################
-
-        return av.VideoFrame.from_ndarray(frm, format="bgr24")
-
-
-lang = st.text_input("Language")
-singer = st.text_input("singer")
-music_player = st.selectbox("Music Player", ["YouTube", "Spotify"])
-
-
-if lang and singer and st.session_state["run"] != "false":
-    webrtc_streamer(key="key", desired_playing_state=True,
-                    video_processor_factory=EmotionProcessor)
-
-btn = st.button("Recommend me songs")
-if btn:
-    if not emotion:
-        st.warning("Please let me capture your emotion first")
-        st.session_state["run"] = "true"
-    else:
-        if music_player == "YouTube":
-            webbrowser.open(f"https://www.youtube.com/results?search_query={lang}+{emotion}+song+{singer}")
-        elif music_player == "Spotify":
-            webbrowser.open(f"https://open.spotify.com/search/{lang} {emotion} song {singer}")
-        np.save("emotion.npy", np.array([""]))
-        st.session_state["run"] = "false"
 ```
 ## Output:
 
-![output1](output1.png)
-![output2](output2.png)
+![output1](o1.png)
 
 ## Result:
 
-The Emotional sensing music therapy project is a real-time application that captures users' emotions through their webcam and provides personalized song recommendations. By leveraging computer vision techniques and a pre-trained emotion classification model, the application accurately detects users' emotions and overlays them on the live video stream.
-
-With the Emotional sensing music therapy project, users can explore a personalized music playlist tailored to their emotions, language, and preferred artist. Whether they want to discover new songs or find comfort in familiar melodies, this project enhances the music listening experience by leveraging the power of computer vision and machine learning.
-
-The project is a valuable tool for music enthusiasts, researchers, and developers interested in emotion recognition, recommendation systems, and human-computer interaction.
+Thus a python code is implemented using Neural Network Model and Natural language Processing Tool Kit for Home remedy recommendation chatbot using a json dataset file.
 
 
